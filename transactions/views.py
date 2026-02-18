@@ -116,7 +116,6 @@ class TransactionViewSet(viewsets.ModelViewSet):
         queryset = self.get_queryset()
         
         # Group by category
-        from django.db.models import Q
         categories_data = queryset.values(
             'category__name', 'transaction_type'
         ).annotate(

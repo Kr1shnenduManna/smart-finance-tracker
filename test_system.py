@@ -135,7 +135,8 @@ def main():
     print("   - Transactions: http://localhost:8000/api/transactions/")
     print("   - Budgets: http://localhost:8000/api/budgets/")
     print("   - Admin: http://localhost:8000/admin/")
-    print("\n🔐 Login with: username=admin, password=admin123")
+    print("\n🔐 Demo credentials: username=admin, password=admin123")
+    print("   Note: Change these credentials in production!")
 
 if __name__ == '__main__':
     main()

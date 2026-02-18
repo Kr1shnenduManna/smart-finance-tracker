@@ -53,15 +53,3 @@ class Transaction(models.Model):
     class Meta:
         db_table = 'transactions'
         ordering = ['-date', '-created_at']
-    
-    def save(self, *args, **kwargs):
-        """Override save to update account balance"""
-        is_new = self.pk is None
-        if is_new:
-            # New transaction - update balance
-            if self.transaction_type == 'income':
-                self.account.balance += self.amount
-            else:
-                self.account.balance -= self.amount
-            self.account.save()
-        super().save(*args, **kwargs)

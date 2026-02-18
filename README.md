@@ -102,27 +102,40 @@ Smart Finance Tracker is a comprehensive Django-based personal finance managemen
    pip install -r requirements.txt
    ```
 
-4. **Run database migrations**
+4. **Set environment variables (important for production)**
+   ```bash
+   # Linux/Mac
+   export DJANGO_SECRET_KEY='your-secret-key-here'
+   export DEBUG=False
+   
+   # Windows
+   set DJANGO_SECRET_KEY=your-secret-key-here
+   set DEBUG=False
+   ```
+   
+   **Note**: For production, always set a strong SECRET_KEY and set DEBUG=False
+
+5. **Run database migrations**
    ```bash
    python manage.py migrate
    ```
 
-5. **Populate default categories**
+6. **Populate default categories**
    ```bash
    python manage.py populate_categories
    ```
 
-6. **Create a superuser**
+7. **Create a superuser**
    ```bash
    python manage.py createsuperuser
    ```
 
-7. **Run the development server**
+8. **Run the development server**
    ```bash
    python manage.py runserver
    ```
 
-8. **Access the application**
+9. **Access the application**
    - Admin panel: http://127.0.0.1:8000/admin/
    - API root: http://127.0.0.1:8000/api/
 
