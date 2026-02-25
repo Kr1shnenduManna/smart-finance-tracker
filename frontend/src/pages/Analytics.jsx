@@ -1,12 +1,9 @@
 import { useState, useEffect, useMemo } from 'react';
 import { getTransactions, getTransactionsByCategory, getTransactionSummary, getAccounts } from '../api/endpoints';
 import { BarChart, Bar, PieChart, Pie, Cell, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
+import { useCurrency } from '../context/CurrencyContext';
 
 const COLORS = ['#6366f1', '#f43f5e', '#10b981', '#f59e0b', '#3b82f6', '#8b5cf6', '#ec4899', '#14b8a6', '#f97316', '#64748b'];
-
-function formatCurrency(n) {
-  return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(n || 0);
-}
 
 export default function Analytics() {
   const [transactions, setTransactions] = useState([]);
@@ -14,6 +11,7 @@ export default function Analytics() {
   const [selectedAccount, setSelectedAccount] = useState('all');
   const [period, setPeriod] = useState('30'); // days
   const [loading, setLoading] = useState(true);
+  const { fc, symbol, convert } = useCurrency();
 
   useEffect(() => { loadData(); }, []);
 
@@ -110,19 +108,19 @@ export default function Analytics() {
       <div className="stats-grid" style={{ marginBottom: 24 }}>
         <div className="card"><div className="card-body" style={{ padding: 20 }}>
           <div style={{ fontSize: 12, color: 'var(--gray-500)' }}>Total Income</div>
-          <div style={{ fontSize: 24, fontWeight: 700, color: 'var(--success)' }}>{formatCurrency(stats.income)}</div>
+          <div style={{ fontSize: 24, fontWeight: 700, color: 'var(--success)' }}>{fc(stats.income)}</div>
         </div></div>
         <div className="card"><div className="card-body" style={{ padding: 20 }}>
           <div style={{ fontSize: 12, color: 'var(--gray-500)' }}>Total Expenses</div>
-          <div style={{ fontSize: 24, fontWeight: 700, color: 'var(--danger)' }}>{formatCurrency(stats.expense)}</div>
+          <div style={{ fontSize: 24, fontWeight: 700, color: 'var(--danger)' }}>{fc(stats.expense)}</div>
         </div></div>
         <div className="card"><div className="card-body" style={{ padding: 20 }}>
           <div style={{ fontSize: 12, color: 'var(--gray-500)' }}>Net Savings</div>
-          <div style={{ fontSize: 24, fontWeight: 700, color: stats.savings >= 0 ? 'var(--success)' : 'var(--danger)' }}>{formatCurrency(stats.savings)}</div>
+          <div style={{ fontSize: 24, fontWeight: 700, color: stats.savings >= 0 ? 'var(--success)' : 'var(--danger)' }}>{fc(stats.savings)}</div>
         </div></div>
         <div className="card"><div className="card-body" style={{ padding: 20 }}>
           <div style={{ fontSize: 12, color: 'var(--gray-500)' }}>Avg Daily Spend</div>
-          <div style={{ fontSize: 24, fontWeight: 700 }}>{formatCurrency(stats.avgDaily)}</div>
+          <div style={{ fontSize: 24, fontWeight: 700 }}>{fc(stats.avgDaily)}</div>
         </div></div>
       </div>
 
@@ -136,8 +134,8 @@ export default function Analytics() {
                 <BarChart data={monthlyTrend}>
                   <CartesianGrid strokeDasharray="3 3" stroke="var(--gray-100)" />
                   <XAxis dataKey="month" tick={{ fontSize: 12 }} />
-                  <YAxis tick={{ fontSize: 12 }} tickFormatter={(v) => `₹${(v/1000).toFixed(0)}k`} />
-                  <Tooltip formatter={(v) => formatCurrency(v)} />
+                  <YAxis tick={{ fontSize: 12 }} tickFormatter={(v) => `${symbol}${(convert(v)/1000).toFixed(0)}k`} />
+                  <Tooltip formatter={(v) => fc(v)} />
                   <Legend />
                   <Bar dataKey="income" fill="#10b981" radius={[4, 4, 0, 0]} name="Income" />
                   <Bar dataKey="expense" fill="#f43f5e" radius={[4, 4, 0, 0]} name="Expense" />
@@ -157,7 +155,7 @@ export default function Analytics() {
                   <Pie data={categoryData} cx="50%" cy="50%" outerRadius={100} dataKey="value" label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}>
                     {categoryData.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
                   </Pie>
-                  <Tooltip formatter={(v) => formatCurrency(v)} />
+                  <Tooltip formatter={(v) => fc(v)} />
                 </PieChart>
               </ResponsiveContainer>
             ) : <div className="empty-state"><p>No expense data</p></div>}
@@ -180,8 +178,8 @@ export default function Analytics() {
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--gray-100)" />
                 <XAxis dataKey="date" tick={{ fontSize: 11 }} tickFormatter={(d) => new Date(d).toLocaleDateString('en-IN', { month: 'short', day: 'numeric' })} />
-                <YAxis tick={{ fontSize: 12 }} tickFormatter={(v) => `₹${(v / 1000).toFixed(0)}k`} />
-                <Tooltip formatter={(v) => formatCurrency(v)} labelFormatter={(d) => new Date(d).toLocaleDateString('en-IN', { weekday: 'short', month: 'short', day: 'numeric' })} />
+                <YAxis tick={{ fontSize: 12 }} tickFormatter={(v) => `${symbol}${(convert(v) / 1000).toFixed(0)}k`} />
+                <Tooltip formatter={(v) => fc(v)} labelFormatter={(d) => new Date(d).toLocaleDateString('en-IN', { weekday: 'short', month: 'short', day: 'numeric' })} />
                 <Area type="monotone" dataKey="amount" stroke="#f43f5e" fill="url(#spendGrad)" strokeWidth={2} name="Spending" />
               </AreaChart>
             </ResponsiveContainer>
@@ -207,7 +205,7 @@ export default function Analytics() {
                           <span style={{ display: 'inline-block', width: 8, height: 8, borderRadius: '50%', background: COLORS[i % COLORS.length], marginRight: 8 }} />
                           {c.name}
                         </td>
-                        <td style={{ fontWeight: 600 }}>{formatCurrency(c.value)}</td>
+                        <td style={{ fontWeight: 600 }}>{fc(c.value)}</td>
                         <td>{pct.toFixed(1)}%</td>
                         <td>
                           <div style={{ background: 'var(--gray-100)', borderRadius: 4, height: 8, width: 120, overflow: 'hidden' }}>

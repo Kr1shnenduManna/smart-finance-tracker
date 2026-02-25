@@ -1,12 +1,10 @@
 import { useState, useEffect } from 'react';
-import { getAccounts, createAccount, updateAccount, deleteAccount } from '../api/endpoints';
-import { Plus, Pencil, Trash2, Wallet, AlertTriangle } from 'lucide-react';
+import { getAccounts, createAccount, updateAccount, deleteAccount, getCurrencies, updateProfile, getMe } from '../api/endpoints';
+import { Plus, Pencil, Trash2, Wallet, AlertTriangle, Check, RefreshCw } from 'lucide-react';
 import Modal from '../components/Modal';
 import { useToast } from '../context/ToastContext';
-
-function formatCurrency(n) {
-  return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(n || 0);
-}
+import { useAuth } from '../context/AuthContext';
+import { useCurrency } from '../context/CurrencyContext';
 
 const ACCOUNT_TYPES = [
   { value: 'savings', label: 'Savings Account' },
@@ -22,13 +20,34 @@ export default function Settings() {
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [editing, setEditing] = useState(null);
+  const [currencies, setCurrencies] = useState([]);
+  const [selectedCurrency, setSelectedCurrency] = useState('INR');
+  const [savingCurrency, setSavingCurrency] = useState(false);
   const { addToast } = useToast();
+  const { user, fetchUser } = useAuth();
+  const { fc } = useCurrency();
 
   const [form, setForm] = useState({
     name: '', account_type: 'savings', balance: '', currency: 'INR',
   });
 
-  useEffect(() => { loadAccounts(); }, []);
+  useEffect(() => {
+    loadAccounts();
+    loadCurrencies();
+  }, []);
+
+  useEffect(() => {
+    if (user?.preferred_currency) {
+      setSelectedCurrency(user.preferred_currency);
+    }
+  }, [user]);
+
+  const loadCurrencies = async () => {
+    try {
+      const res = await getCurrencies();
+      setCurrencies(res.data || []);
+    } catch (err) { console.error(err); }
+  };
 
   const loadAccounts = async () => {
     setLoading(true);
@@ -75,22 +94,52 @@ export default function Settings() {
     catch { addToast('Failed to delete account', 'error'); }
   };
 
+  const handleCurrencyChange = async (code) => {
+    setSelectedCurrency(code);
+    setSavingCurrency(true);
+    try {
+      await updateProfile({ preferred_currency: code });
+      await fetchUser();
+      addToast(`Currency changed to ${code}`);
+    } catch (err) {
+      addToast('Failed to update currency', 'error');
+      setSelectedCurrency(user?.preferred_currency || 'INR');
+    } finally {
+      setSavingCurrency(false);
+    }
+  };
+
+  const currentCurr = currencies.find(c => c.code === selectedCurrency) || { code: 'INR', name: 'Indian Rupee', symbol: '₹' };
+
   return (
     <div>
       <div className="page-header">
         <h1>Settings</h1>
       </div>
 
-      {/* Currency Info */}
+      {/* Currency Settings */}
       <div className="card" style={{ marginBottom: 24 }}>
         <div className="card-header"><h3>Currency</h3></div>
         <div className="card-body">
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <span style={{ fontSize: 28, fontWeight: 700 }}>₹</span>
-            <div>
-              <div style={{ fontWeight: 600 }}>Indian Rupee (INR)</div>
-              <div style={{ fontSize: 12, color: 'var(--gray-500)' }}>All amounts are displayed in INR</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 16 }}>
+            <span style={{ fontSize: 28, fontWeight: 700 }}>{currentCurr.symbol}</span>
+            <div style={{ flex: 1 }}>
+              <div style={{ fontWeight: 600 }}>{currentCurr.name} ({currentCurr.code})</div>
+              <div style={{ fontSize: 12, color: 'var(--gray-500)' }}>All amounts are displayed in {currentCurr.code}</div>
             </div>
+            {savingCurrency && <RefreshCw size={16} className="spin" style={{ color: 'var(--primary)' }} />}
+          </div>
+          <div className="form-group" style={{ marginBottom: 0 }}>
+            <label>Change Currency</label>
+            <select
+              value={selectedCurrency}
+              onChange={(e) => handleCurrencyChange(e.target.value)}
+              style={{ maxWidth: 320 }}
+            >
+              {currencies.map((c) => (
+                <option key={c.code} value={c.code}>{c.symbol}  {c.name} ({c.code})</option>
+              ))}
+            </select>
           </div>
         </div>
       </div>
@@ -121,7 +170,7 @@ export default function Settings() {
                       <td style={{ fontWeight: 600 }}>{acc.name}</td>
                       <td><span className="badge-tag">{ACCOUNT_TYPES.find(t => t.value === acc.account_type)?.label || acc.account_type}</span></td>
                       <td style={{ fontWeight: 700, color: parseFloat(acc.balance) >= 0 ? 'var(--success)' : 'var(--danger)' }}>
-                        {formatCurrency(acc.balance)}
+                        {fc(acc.balance)}
                       </td>
                       <td>
                         <div className="table-actions">
@@ -170,7 +219,7 @@ export default function Settings() {
               </select>
             </div>
             <div className="form-group">
-              <label>Balance (₹)</label>
+              <label>Balance ({currentCurr.symbol})</label>
               <input type="number" step="0.01" placeholder="0.00" value={form.balance} onChange={(e) => setForm({ ...form, balance: e.target.value })} required />
             </div>
             <div className="modal-actions">

@@ -26,6 +26,8 @@ urlpatterns = [
     path("api/transactions/", include("transactions.urls")),
     path("api/budgets/", include("budgets.urls")),
     path("api/ml/", include("ml_features.urls")),
+    path("api/bills/", include("bills.urls")),
+    path("api/goals/", include("goals.urls")),
     path("api-auth/", include("rest_framework.urls")),
 ]
 

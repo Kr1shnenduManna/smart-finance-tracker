@@ -1,11 +1,13 @@
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, ArrowLeftRight, PiggyBank, BarChart3, User, Settings, Wallet, Tags, LogOut } from 'lucide-react';
+import { LayoutDashboard, ArrowLeftRight, PiggyBank, BarChart3, User, Settings, Wallet, Tags, LogOut, Receipt, Target } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 const navItems = [
   { path: '/', label: 'Overview', icon: LayoutDashboard },
   { path: '/transactions', label: 'Transactions', icon: ArrowLeftRight },
   { path: '/budgets', label: 'Budgets', icon: PiggyBank },
+  { path: '/bills', label: 'Bills & Reminders', icon: Receipt },
+  { path: '/goals', label: 'Savings Goals', icon: Target },
   { path: '/analytics', label: 'Analytics', icon: BarChart3 },
   { path: '/categories', label: 'Categories', icon: Tags },
   { path: '/profile', label: 'Profile', icon: User },

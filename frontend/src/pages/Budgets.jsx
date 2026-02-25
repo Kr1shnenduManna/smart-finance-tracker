@@ -3,10 +3,7 @@ import { getBudgets, getActiveBudgets, getBudgetAlerts, getCategories, createBud
 import { Plus, AlertTriangle, Trash2, TrendingUp } from 'lucide-react';
 import Modal from '../components/Modal';
 import { useToast } from '../context/ToastContext';
-
-function formatCurrency(n) {
-  return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(n || 0);
-}
+import { useCurrency } from '../context/CurrencyContext';
 
 export default function Budgets() {
   const [budgets, setBudgets] = useState([]);
@@ -15,6 +12,7 @@ export default function Budgets() {
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const { addToast } = useToast();
+  const { fc, symbol } = useCurrency();
 
   const today = new Date().toISOString().split('T')[0];
   const monthEnd = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).toISOString().split('T')[0];
@@ -120,8 +118,8 @@ export default function Budgets() {
                   </div>
 
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: 'var(--gray-600)', marginBottom: 6 }}>
-                    <span>Spent: {formatCurrency(b.spent_amount)}</span>
-                    <span>of {formatCurrency(b.amount)}</span>
+                    <span>Spent: {fc(b.spent_amount)}</span>
+                    <span>of {fc(b.amount)}</span>
                   </div>
 
                   {/* Progress bar */}
@@ -135,7 +133,7 @@ export default function Budgets() {
                     </div>
                     {b.remaining_amount !== undefined && (
                       <div style={{ fontSize: 12, color: b.remaining_amount >= 0 ? 'var(--success)' : 'var(--danger)' }}>
-                        {b.remaining_amount >= 0 ? `${formatCurrency(b.remaining_amount)} left` : `${formatCurrency(Math.abs(b.remaining_amount))} over`}
+                        {b.remaining_amount >= 0 ? `${fc(b.remaining_amount)} left` : `${fc(Math.abs(b.remaining_amount))} over`}
                       </div>
                     )}
                   </div>
@@ -144,7 +142,7 @@ export default function Budgets() {
                   {b.predicted_amount && (
                     <div style={{ marginTop: 12, padding: '8px 12px', background: 'var(--gray-50)', borderRadius: 8, display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: 'var(--gray-600)' }}>
                       <TrendingUp size={14} color="var(--primary)" />
-                      ML Predicted: {formatCurrency(b.predicted_amount)}
+                      ML Predicted: {fc(b.predicted_amount)}
                     </div>
                   )}
 
@@ -170,7 +168,7 @@ export default function Budgets() {
               </select>
             </div>
             <div className="form-group">
-              <label>Budget Amount (₹)</label>
+              <label>Budget Amount ({symbol})</label>
               <input type="number" step="0.01" placeholder="e.g. 5000" value={form.amount} onChange={(e) => setForm({ ...form, amount: e.target.value })} required />
             </div>
             <div className="form-group">

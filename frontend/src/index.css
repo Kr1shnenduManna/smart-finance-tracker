@@ -339,11 +339,192 @@ input, select, textarea { font-family: inherit; }
 }
 .topbar-right .notification-btn .badge {
   position: absolute;
-  top: -2px; right: -2px;
-  width: 8px; height: 8px;
+  top: -4px; right: -4px;
+  min-width: 18px; height: 18px;
   background: var(--danger);
-  border-radius: 50%;
+  border-radius: 9px;
   border: 2px solid #fff;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  padding: 0 4px;
+  line-height: 1;
+}
+
+/* ── Notification Dropdown ── */
+.notification-wrapper {
+  position: relative;
+}
+.notification-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  width: 380px;
+  max-height: 480px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.06);
+  border: 1px solid var(--gray-200);
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: notifSlideIn 0.18s ease-out;
+}
+@keyframes notifSlideIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.notif-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px 10px;
+  border-bottom: 1px solid var(--gray-200);
+}
+.notif-header h4 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--gray-900);
+}
+.notif-mark-all {
+  display: flex; align-items: center; gap: 4px;
+  font-size: 12px;
+  color: var(--primary);
+  background: none; border: none;
+  cursor: pointer;
+  font-weight: 600;
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: background 0.15s;
+}
+.notif-mark-all:hover {
+  background: var(--gray-100);
+}
+.notif-list {
+  flex: 1;
+  overflow-y: auto;
+  max-height: 360px;
+}
+.notif-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 16px;
+  color: var(--gray-400);
+  gap: 8px;
+}
+.notif-empty p {
+  margin: 0;
+  font-size: 14px;
+}
+.notif-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 16px;
+  cursor: pointer;
+  transition: background 0.12s;
+  border-bottom: 1px solid var(--gray-100);
+  position: relative;
+}
+.notif-item:hover {
+  background: var(--gray-50);
+}
+.notif-item.unread {
+  background: rgba(99, 102, 241, 0.04);
+}
+.notif-item.unread::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--primary);
+  border-radius: 0 3px 3px 0;
+}
+.notif-item-icon {
+  width: 32px; height: 32px;
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.notif-icon.overdue {
+  color: var(--danger);
+}
+.notif-icon.paid {
+  color: var(--success);
+}
+.notif-icon.due-soon {
+  color: var(--warning);
+}
+.notif-item-icon {
+  background: var(--gray-100);
+}
+.notif-item.unread .notif-item-icon {
+  background: rgba(99, 102, 241, 0.1);
+}
+.notif-item-content {
+  flex: 1;
+  min-width: 0;
+}
+.notif-item-message {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--gray-800);
+  line-height: 1.4;
+}
+.notif-item.unread .notif-item-message {
+  font-weight: 600;
+  color: var(--gray-900);
+}
+.notif-item-amount {
+  display: block;
+  font-size: 12px;
+  color: var(--gray-500);
+  margin-top: 2px;
+}
+.notif-item-time {
+  display: block;
+  font-size: 11px;
+  color: var(--gray-400);
+  margin-top: 2px;
+}
+.notif-item-read-btn {
+  background: none; border: none;
+  color: var(--gray-400);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  margin-top: 2px;
+  transition: color 0.15s, background 0.15s;
+}
+.notif-item-read-btn:hover {
+  color: var(--primary);
+  background: var(--gray-100);
+}
+.notif-footer {
+  border-top: 1px solid var(--gray-200);
+  padding: 10px 16px;
+  text-align: center;
+}
+.notif-footer button {
+  background: none; border: none;
+  color: var(--primary);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.notif-footer button:hover {
+  text-decoration: underline;
 }
 .user-avatar {
   width: 36px; height: 36px;

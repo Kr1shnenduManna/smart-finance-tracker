@@ -2,6 +2,53 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 
 
+CURRENCY_CHOICES = [
+    ("INR", "Indian Rupee"),
+    ("USD", "US Dollar"),
+    ("EUR", "Euro"),
+    ("GBP", "British Pound"),
+    ("JPY", "Japanese Yen"),
+    ("CAD", "Canadian Dollar"),
+    ("AUD", "Australian Dollar"),
+    ("CNY", "Chinese Yuan"),
+    ("CHF", "Swiss Franc"),
+    ("SGD", "Singapore Dollar"),
+    ("AED", "UAE Dirham"),
+    ("BDT", "Bangladeshi Taka"),
+    ("BRL", "Brazilian Real"),
+    ("KRW", "South Korean Won"),
+    ("MYR", "Malaysian Ringgit"),
+    ("THB", "Thai Baht"),
+    ("ZAR", "South African Rand"),
+    ("SEK", "Swedish Krona"),
+    ("NOK", "Norwegian Krone"),
+    ("NZD", "New Zealand Dollar"),
+]
+
+CURRENCY_SYMBOLS = {
+    "INR": "₹",
+    "USD": "$",
+    "EUR": "€",
+    "GBP": "£",
+    "JPY": "¥",
+    "CAD": "C$",
+    "AUD": "A$",
+    "CNY": "¥",
+    "CHF": "CHF",
+    "SGD": "S$",
+    "AED": "د.إ",
+    "BDT": "৳",
+    "BRL": "R$",
+    "KRW": "₩",
+    "MYR": "RM",
+    "THB": "฿",
+    "ZAR": "R",
+    "SEK": "kr",
+    "NOK": "kr",
+    "NZD": "NZ$",
+}
+
+
 class User(AbstractUser):
     """Custom User model extending Django's AbstractUser"""
 
@@ -9,6 +56,9 @@ class User(AbstractUser):
     phone = models.CharField(max_length=20, blank=True)
     profile_picture = models.ImageField(
         upload_to="profile_pics/", blank=True, null=True
+    )
+    preferred_currency = models.CharField(
+        max_length=3, choices=CURRENCY_CHOICES, default="INR"
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

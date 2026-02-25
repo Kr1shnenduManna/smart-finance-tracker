@@ -48,6 +48,8 @@ INSTALLED_APPS = [
     "transactions",
     "budgets",
     "ml_features",
+    "bills",
+    "goals",
 ]
 
 MIDDLEWARE = [
