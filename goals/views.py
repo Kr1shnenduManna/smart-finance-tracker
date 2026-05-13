@@ -40,21 +40,27 @@ class SavingsGoalViewSet(viewsets.ModelViewSet):
 
         amount = Decimal(str(amount))
 
-        # Create the transaction if the goal has a linked account
-        transaction = None
-        if goal.account:
-            # Use or create a "Savings" category
-            category = Category.objects.filter(
-                name="Savings", category_type="expense"
-            ).first()
-            if not category:
-                category = Category.objects.create(
-                    name="Savings", category_type="expense", is_system=True
-                )
+        # Use goal's linked account, or fall back to user's primary account
+        from accounts.models import Account as UserAccount
+        account = goal.account or UserAccount.objects.filter(
+            user=request.user, is_active=True
+        ).first()
 
+        # Use or create a "Savings" category
+        category = Category.objects.filter(
+            name="Savings", category_type="expense"
+        ).first()
+        if not category:
+            category = Category.objects.create(
+                name="Savings", category_type="expense", is_system=True
+            )
+
+        # Always create a transaction (signal handles balance deduction automatically)
+        transaction = None
+        if account:
             transaction = Transaction.objects.create(
                 user=request.user,
-                account=goal.account,
+                account=account,
                 category=category,
                 transaction_type="expense",
                 amount=amount,

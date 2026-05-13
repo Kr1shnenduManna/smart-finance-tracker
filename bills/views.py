@@ -33,29 +33,35 @@ class BillViewSet(viewsets.ModelViewSet):
         amount_paid = Decimal(str(request.data.get("amount_paid", bill.amount)))
         notes = request.data.get("notes", "")
 
-        # Create the transaction if the bill has a linked account
-        transaction = None
-        if bill.account:
-            # Try to use the bill's category, fall back to a generic "Bills" category
-            category = bill.category
-            if not category:
-                category = Category.objects.filter(
-                    name="Bills", category_type="expense"
-                ).first()
-                if not category:
-                    category = Category.objects.create(
-                        name="Bills", category_type="expense", is_system=True
-                    )
+        # Use the bill's linked account, or fall back to user's primary account
+        from accounts.models import Account as UserAccount
+        account = bill.account or UserAccount.objects.filter(
+            user=request.user, is_active=True
+        ).first()
 
+        # Try to use the bill's category, fall back to a generic "Bills" category
+        category = bill.category
+        if not category:
+            category = Category.objects.filter(
+                name="Bills", category_type="expense"
+            ).first()
+            if not category:
+                category = Category.objects.create(
+                    name="Bills", category_type="expense", is_system=True
+                )
+
+        # Always create a transaction (signal handles balance deduction automatically)
+        transaction = None
+        if account:
             transaction = Transaction.objects.create(
                 user=request.user,
-                account=bill.account,
+                account=account,
                 category=category,
                 transaction_type="expense",
                 amount=amount_paid,
                 description=f"Bill payment: {bill.name}",
                 date=timezone.now().date(),
-                notes=notes or f"Auto-recorded from bill: {bill.name}",
+                notes=notes or f"Payment for bill: {bill.name}",
                 is_recurring=bill.frequency != "once",
             )
 

@@ -28,6 +28,8 @@ urlpatterns = [
     path("api/ml/", include("ml_features.urls")),
     path("api/bills/", include("bills.urls")),
     path("api/goals/", include("goals.urls")),
+    # Chatbot & Agent API (can be removed to disable chatbot feature)
+    path("api/chatbot/", include("chatbot.urls")),
     path("api-auth/", include("rest_framework.urls")),
 ]
 
