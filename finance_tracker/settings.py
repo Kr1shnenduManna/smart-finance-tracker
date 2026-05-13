@@ -50,6 +50,8 @@ INSTALLED_APPS = [
     "ml_features",
     "bills",
     "goals",
+    # Chatbot & Agent (can be removed to disable chatbot feature)
+    "chatbot",
 ]
 
 MIDDLEWARE = [
@@ -171,3 +173,19 @@ AUTH_USER_MODEL = "accounts.User"
 LOGIN_URL = "/accounts/login/"
 LOGIN_REDIRECT_URL = "/dashboard/"
 LOGOUT_REDIRECT_URL = "/"
+# Gemini LLM Configuration
+# Get your API key from: https://ai.google.dev/
+GEMINI_CONFIG = {
+    "api_key": os.environ.get("GEMINI_API_KEY", ""),
+    "model": os.environ.get("GEMINI_MODEL", "gemini-2.5-flash"),
+    "enabled": os.environ.get("GEMINI_ENABLED", "False").lower() == "true",
+    "temperature": float(os.environ.get("GEMINI_TEMPERATURE", "0.7")),
+}
+
+# Ollama LLM Configuration (local fallback)
+OLLAMA_CONFIG = {
+    "base_url": os.environ.get("OLLAMA_BASE_URL", "http://localhost:11434"),
+    "model": os.environ.get("OLLAMA_MODEL", "mistral"),
+    "timeout": int(os.environ.get("OLLAMA_TIMEOUT", "120")),
+    "enabled": os.environ.get("OLLAMA_ENABLED", "True").lower() == "true",
+}
