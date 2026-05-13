@@ -550,7 +550,7 @@ If you use Smart Finance Tracker in your research, please cite:
 ## Contact
 
 **Author**: Krishnendu Manna  
-**Email**: [Your Email]  
+**Email**: krishnendumanna29@gmail.com
 **GitHub**: [@Kr1shnenduManna](https://github.com/Kr1shnenduManna)
 
 ---
